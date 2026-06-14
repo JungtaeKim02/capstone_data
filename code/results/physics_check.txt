@@ -1,0 +1,80 @@
+====================================================================================
+PHYSICS-FIRST CHECK  (slim-10 @ final constants, train pool run_1..5)
+  prior frozen_at = 2026-06-14T07:58:59Z
+  prior sha256    = bc9c7b560d96adb8fd87dc4c4c5ab7bf2c3885052ac630355468d294b5224b60
+  constants: sg_v=91 sg_a=51 sg_as=21 sg_vp=161 lag_a=30 fc_slow=0.025 alpha=10.0
+====================================================================================
+
+--- per-joint coefficients (b_raw) and scale-free contribution (|b_std|/sigma_y) ---
+  feature           J2 b_raw     J3 b_raw     J4 b_raw   J2 contr   J3 contr   J4 contr
+  vL               -134.3490    -177.5651    -234.3263     0.3593     0.5666     0.9164
+  cos_c3             60.8549      67.9141       1.7647     0.1362     0.1801     0.0058
+  tanh_vP           -65.2816     -51.4063     -26.9556     0.4877     0.4647     0.3021
+  aL                -12.3042      -7.1512      -2.3580     0.1668     0.0988     0.0384
+  sin_q2             71.7038       2.6274      -0.8913     0.2622     0.0114     0.0047
+  lag_vL_a          -48.5732       2.8370      48.7181     0.1299     0.0091     0.1905
+  lag_aL_a            1.5238       2.4669       3.1229     0.0207     0.0341     0.0509
+  cos_c4             29.1784      22.6245      21.6633     0.1089     0.1000     0.1178
+  coul_sin_c3       -23.2487     -14.2188      -1.9059     0.0786     0.0584     0.0096
+  adiff              -3.4445      -4.2560      -3.8338     0.0560     0.1038     0.0818
+
+--- gravity-column correlation (run_1, J2 design) -- context for sign reads ---
+               sin_q2   cos_c3   cos_c4
+  sin_q2        1.000    0.432    0.382
+  cos_c3        0.432    1.000    0.861
+  cos_c4        0.382    0.861    1.000
+
+====================================================================================
+PREDICTION CHECKS  (PASS / FAIL / n.a.)  -- each was frozen before this fit
+====================================================================================
+
+sin_q2  (gravity i=2):
+  present on J2, negligible on J3&J4 ?  contr J2=0.262 J3=0.011 J4=0.005  -> PASS
+  on-J2 gravity order sin_q2>=cos_c3>=cos_c4 ? 0.262>=0.136>=0.109  -> PASS
+
+cos_c3  (gravity i=3):
+  present J2&J3, negligible J4 ?  contr J2=0.136 J3=0.180 J4=0.006  -> PASS
+  sign(J2)==sign(J3) ?  + +  -> PASS
+
+cos_c4  (gravity i=4):
+  present on all ?  contr J2=0.109 J3=0.100 J4=0.118
+  sign equal across J2,J3,J4 ?  + + +  -> PASS
+
+aL  (diagonal inertia M_jj):
+  b_raw J2=-12.3042 J3=-7.1512 J4=-2.3580
+  sign equal across joints ?  - - -  -> PASS
+  |b_raw| order J2>=J3>=J4 ?  -> PASS
+
+vL (viscous) + tanh_vP (Coulomb)  -- friction family sign:
+  vL sign      J2=- J3=- J4=-  (same across joints ? PASS)
+  tanh_vP sign J2=- J3=- J4=-
+  sign(vL)==sign(tanh_vP) per joint ?  -> PASS
+
+coul_sin_c3 (load-dependent Coulomb):
+  contr J2=0.079 J3=0.058 J4=0.010  non-negligible ? -> PASS
+
+lag_vL_a  (EMPIRICAL -- no rigid-body prediction):
+  contr J2=0.130 J3=0.009 J4=0.191  -> n.a. (graded empirical a priori)
+
+lag_aL_a  (EMPIRICAL -- no rigid-body prediction):
+  contr J2=0.021 J3=0.034 J4=0.051  -> n.a. (graded empirical a priori)
+
+adiff  (EMPIRICAL -- no rigid-body prediction):
+  contr J2=0.056 J3=0.104 J4=0.082  -> n.a. (graded empirical a priori)
+
+====================================================================================
+FINAL THREE-GRADE CLASSIFICATION
+====================================================================================
+  feature      EOM origin            prior grade   data verdict  final grade
+  vL           viscous friction b*qd physics       matches       physics + data-confirmed
+  cos_c3       gravity g_j, absolute physics       matches       physics + data-confirmed
+  tanh_vP      Coulomb friction fc*s physics       matches       physics + data-confirmed
+  aL           diagonal inertia M_jj physics       matches       physics + data-confirmed
+  sin_q2       gravity g_j, absolute physics       matches       physics + data-confirmed
+  lag_vL_a     NONE (rigid-body EOM  empirical     n.a.          empirical (mechanism unverified)
+  lag_aL_a     NONE (rigid-body EOM  empirical     n.a.          empirical (mechanism unverified)
+  cos_c4       gravity g_j, absolute physics       matches       physics + data-confirmed
+  coul_sin_c3  load-dependent Coulom physics_weak  matches       physics(weak) + data-confirmed
+  adiff        NONE (band-pass accel empirical     n.a.          empirical (mechanism unverified)
+
+wrote physics_check.json + results/physics_check.txt

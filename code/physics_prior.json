@@ -1,0 +1,123 @@
+{
+  "_meta": {
+    "frozen_at_utc": "2026-06-14T07:58:59Z",
+    "purpose": "PRE-REGISTERED physics predictions for the x0 LOAD slim-10. Written BEFORE extracting any fitted coefficient. The check script (physics_check.py) READS this file; it never writes it. Predictions are derived from rigid-body mechanics ALONE, independent of fitted values.",
+    "honesty_note": "I (the author) have prior exposure to this dataset from earlier sessions. This is therefore NOT a blind pre-registration. The value is methodological: every sign / zero-structure / ordering prediction below follows from the EOM of a planar serial chain, NOT from inspecting coefficients. Several predictions (e.g. sin_q2 must be ~0 on J3/J4; cos_c4 same sign on all 3 joints; on-J2 gravity ordering sin_q2>cos_c3>cos_c4) were never checked in prior work.",
+    "robot": "SO-ARM101, planar-dominant serial chain. Modelled joints J2=shoulder_lift, J3=elbow_flex, J4=wrist_flex. Identical high-gear-ratio STS3215 servos.",
+    "constraint": "load/current channels are UNCALIBRATED. Absolute N*m magnitude checks are impossible. We therefore test only (a) SIGN, (b) zero/non-zero STRUCTURE across joints, (c) cross-joint and within-joint RELATIVE ORDERING. The STS3215 load register uses the same encoding on every (identical) servo, so raw coefficients are treated as roughly comparable across joints, with that caveat flagged."
+  },
+
+  "eom": {
+    "model": "tau_j = sum_k M_jk(q) qddot_k + C_j(q,qdot) + g_j(q) + f_j(qdot, load)",
+    "gravity": "For a planar serial chain with absolute link angles theta_i = q2+...+qi, g_j(q) = sum_{i>=j} A_i cos(theta_i), with A_i = g * a_i * (sum_{k>=i} m_k). KEY STRUCTURE: A_i depends only on i, NOT on j -> the SAME absolute-angle term has the SAME coefficient on every joint j<=i, and is identically ABSENT for j>i (lower-triangular gravity coupling).",
+    "encoder_phase": "theta_2 -> column sin_q2, theta_3=c3 -> column cos_c3, theta_4=c4 -> column cos_c4. sin vs cos is fixed by each joint's encoder zero offset from horizontal; physically each is a sinusoid of one absolute link angle.",
+    "inertia": "Diagonal M_jj qddot_j dominates. At high gear ratio reflected motor inertia N^2*J_motor (identical across the 3 identical servos) dominates the diagonal; link inertia adds on top and is larger for more proximal joints.",
+    "friction": "f = b*qdot (viscous, column vL) + fc*sign(qdot) (Coulomb, smoothed as tanh(v/fc); columns tanh_vP and the velocity part of coul_sin_c3). Load-dependent Coulomb: normal/tooth force in the gearbox tracks gravity torque -> coul_sin_c3 = tanh(vL/fc)*sin(c3).",
+    "not_in_rigid_eom": "Transport delay / gear-train compliance (lag_vL_a, lag_aL_a) and band-pass acceleration (adiff) are NOT terms of the rigid-body EOM. They are drivetrain-dynamics / numerical-band constructs."
+  },
+
+  "features": {
+    "sin_q2": {
+      "eom_term": "gravity g_j, absolute-angle term i=2 (theta_2)",
+      "grade_prior": "physics",
+      "pred": {
+        "present_on": [2],
+        "negligible_on": [3, 4],
+        "reason_zero": "q2 enters J3/J4 gravity ONLY through c3,c4 (cos_c3,cos_c4). The standalone i=2 term appears only for j=2 (lower-triangular). A large coefficient on J3 or J4 means this column is absorbing non-gravity (posture-friction / calibration), not link-2 gravity.",
+        "sign": "consistent on J2 (single dominant gravity term); polarity itself is set by unknown load sign, so we test internal consistency, not absolute sign",
+        "within_joint_order_on_J2": "|contrib(sin_q2)| >= |contrib(cos_c3)| >= |contrib(cos_c4)| because A_2(whole-arm mass)>A_3>A_4"
+      },
+      "falsification": "If |contrib| on J3 or J4 is comparable to its J2 value -> NOT link-2 gravity; reclassify empirical."
+    },
+    "cos_c3": {
+      "eom_term": "gravity g_j, absolute-angle term i=3 (theta_3=c3)",
+      "grade_prior": "physics",
+      "pred": {
+        "present_on": [2, 3],
+        "negligible_on": [4],
+        "reason_zero": "i=3 term appears for j<=3 only; j=4 gravity has no theta_3 dependence.",
+        "sign": "SAME sign on J2 and J3 (j-independent A_3).",
+        "cross_joint": "sign(b_J2) == sign(b_J3); magnitudes similar (load-scale caveat)"
+      },
+      "falsification": "Opposite signs on J2 vs J3, OR a large coefficient on J4 -> term is not clean i=3 gravity."
+    },
+    "cos_c4": {
+      "eom_term": "gravity g_j, absolute-angle term i=4 (theta_4=c4)",
+      "grade_prior": "physics",
+      "pred": {
+        "present_on": [2, 3, 4],
+        "negligible_on": [],
+        "sign": "SAME sign on ALL of J2,J3,J4 (j-independent A_4).",
+        "cross_joint": "sign(b_J2)==sign(b_J3)==sign(b_J4)"
+      },
+      "falsification": "Any sign disagreement across the three joints -> not clean i=4 gravity."
+    },
+    "aL": {
+      "eom_term": "diagonal inertia M_jj * qddot_j",
+      "grade_prior": "physics",
+      "pred": {
+        "present_on": [2, 3, 4],
+        "sign": "SAME sign on all three joints (load responds to own acceleration with one polarity).",
+        "cross_joint_order": "|b_raw(J2)| >= |b_raw(J3)| >= |b_raw(J4)|  (reflected inertia: more mass beyond a more proximal joint). WEAK: identical servos share N^2*J_motor so values may be close."
+      },
+      "falsification": "Sign differs across joints, OR J4 inertia coefficient strongly exceeds J2 -> not a clean inertia term."
+    },
+    "vL": {
+      "eom_term": "viscous friction b*qdot",
+      "grade_prior": "physics",
+      "pred": {
+        "present_on": [2, 3, 4],
+        "sign": "SAME sign on all joints; AND consistent with the Coulomb terms (tanh_vP, coul_sin_c3 velocity part). All friction is dissipative -> one common velocity->load polarity.",
+        "cross_joint": "sign(vL) == sign(tanh_vP) on every joint"
+      },
+      "falsification": "vL and tanh_vP opposite signs, or vL sign flips across joints -> not a clean friction term."
+    },
+    "tanh_vP": {
+      "eom_term": "Coulomb friction fc*sign(qdot), smoothed on low-pass velocity vP",
+      "grade_prior": "physics",
+      "pred": {
+        "present_on": [2, 3, 4],
+        "sign": "SAME sign as vL on every joint (both dissipative friction).",
+        "note": "use of the LONG low-pass band vP (vs raw v) is the empirical/drivetrain-memory part; the sign prediction is the physics part."
+      },
+      "falsification": "Opposite sign to vL on a joint -> the column is not acting as Coulomb friction there."
+    },
+    "coul_sin_c3": {
+      "eom_term": "load-dependent Coulomb: gearbox normal force ~ gravity torque -> tanh(vL/fc)*sin(c3)",
+      "grade_prior": "physics_weak",
+      "pred": {
+        "present_on": [2, 3, 4],
+        "sign": "no clean joint-independent sign prediction (product of friction sign and a gravity projection that changes sign with posture). Tested only for being non-negligible and for not contradicting the friction family.",
+        "note": "Mechanism (normal-force-dependent friction) is physical but the specific sin(c3) projection is partly empirical -> graded physics_weak."
+      },
+      "falsification": "Negligible contribution on all joints -> the load-modulation hypothesis is unsupported."
+    },
+    "lag_vL_a": {
+      "eom_term": "NONE (rigid-body EOM has no transport delay)",
+      "grade_prior": "empirical",
+      "pred": {
+        "mechanism": "claimed: group delay through a compliant high-ratio gear train. NOT derivable from rigid-body EOM -> no sign/structure prediction is registered.",
+        "honest_label": "empirical, mechanism plausible-but-unverified"
+      },
+      "falsification": "n/a -- there is no prior physical prediction to falsify; that is exactly why it is graded empirical."
+    },
+    "lag_aL_a": {
+      "eom_term": "NONE (rigid-body EOM has no transport delay)",
+      "grade_prior": "empirical",
+      "pred": {
+        "mechanism": "claimed: same drivetrain delay on the inertia channel. Not an EOM term.",
+        "honest_label": "empirical, mechanism plausible-but-unverified"
+      },
+      "falsification": "n/a"
+    },
+    "adiff": {
+      "eom_term": "NONE (band-pass accel aS-aL; numerical/compliance band, not rigid-body)",
+      "grade_prior": "empirical",
+      "pred": {
+        "mechanism": "claimed: fast drivetrain-compliance accel mode above the smoothed-inertia band. Not an EOM term.",
+        "honest_label": "empirical, mechanism plausible-but-unverified"
+      },
+      "falsification": "n/a"
+    }
+  }
+}

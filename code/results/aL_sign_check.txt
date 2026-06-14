@@ -1,0 +1,25 @@
+==============================================================================
+LOAD SIGN CONVENTION + aL inertia-sign verification (pooled run_1..5)
+  model: load_j = kappa_j * s_j * tau_motor,j   (kappa_j>0, s_j in {+1,-1})
+==============================================================================
+
+--- RAW univariate corr(load_j, channel)  (no ridge, no collinearity) ---
+  joint   corr(load,qdot)  corr(load,tanh vP)  corr(load,qddot)  s_j (= sign)
+  J2               -0.817              -0.793            -0.204       -1 (OK)
+  J3               -0.891              -0.857            -0.138       -1 (OK)
+  J4               -0.956              -0.869            -0.105       -1 (OK)
+
+  s_j pinned by viscous friction (corr(load,qdot)) and INDEPENDENTLY
+  reproduced by Coulomb (tanh vP) and inertia (qddot): all share sign.
+
+--- multivariate ridge partial sign (slim-10) for cross-check ---
+  joint     b_raw(aL)   b_raw(vL)  same sign?
+  J2          -12.304    -134.349         yes
+  J3           -7.151    -177.565         yes
+  J4           -2.358    -234.326         yes
+
+--- VERDICT ---
+  d load_j/d qddot_j = kappa_j * s_j * M_jj,  kappa_j>0, M_jj>0 (PD diag) 
+  => sign(aL coef) = s_j.  Data: s_2=s_3=s_4 = -1 (load register inverted
+  vs +q), independently set by friction. Negative aL is PHYSICALLY REQUIRED.
+  => PASS (full), not conditional.

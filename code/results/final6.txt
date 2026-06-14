@@ -1,0 +1,52 @@
+================================================================================
+STAGE 4  FINAL MODEL  (slim-10 @ fine-optimised constants, 6 held-out)
+  constants: sg_v=91 sg_a=51 sg_as=21 sg_vp=161 lag_a=30 fc_slow=0.025 alpha=10.0
+================================================================================
+
+=== model x constants (mean over 6 held-out trajectories) ===
+  model / constants            nfeat  meanCV  worstN meanTest worstTest
+  x0-31  @ default (current)      31  0.9524   0.322   0.9329    0.9030
+  slim-10 @ default               10  0.9548   0.319   0.9339    0.9063
+  x0-31  @ final                  31  0.9659   0.257   0.9502    0.9169
+  slim-10 @ final (FINAL)         10  0.9679   0.234   0.9509    0.9194
+
+=== FINAL slim-10 @ final constants: per-trajectory held-out R2 ===
+  test_noload         0.9563   excitation (diff seed)
+  test_noload_2       0.9604   excitation (diff seed)
+  test_noload_3       0.9614   excitation (diff seed)
+  test_noload_4       0.9522   excitation (diff seed)
+  test_noload_5       0.9557   excitation (diff seed)
+  test_noload_p2p     0.9194   p2p (DIFFERENT TYPE)
+  MEAN                0.9509   worst=0.9194
+
+PAYLOAD SENSITIVITY (slim-10 @ final): dr(m) must grow with mass
+  joint   dr(84g)  dr(146g)  dr(227g)  monotone?
+  J2        44.67     84.67    172.53        yes
+  J3        48.09     70.11    116.70        yes
+  J4        29.21     38.52     52.75        yes
+
+=== per-feature justification (slim-10 @ final) ===
+  feature      group      fwd-gain drop-dR2  EOM/mechanism
+  tanh_vP      history      0.0558   0.0514  Coulomb sign on low-pass vel  [physical+exp]
+                                   -> gear-train lag/windup -> friction sign follows SMOOTHED velocity
+  sin_q2       posture      0.0172   0.0146  EOM gravity  g(q)  [physical]
+                                   -> orthogonal gravity phase on the shoulder link
+  cos_c3       posture      0.0618   0.0123  EOM gravity  g(q)  [physical]
+                                   -> weight of links beyond elbow ~ cos(cumulative angle)
+  aL           inertia      0.0228   0.0080  EOM inertia  M_ii*qddot  [physical]
+                                   -> reflected inertia N^2*Jmotor dominates at high gear ratio
+  cos_c4       posture      0.0026   0.0067  EOM gravity  g(q)  [physical]
+                                   -> weight of wrist link ~ cos(cumulative angle to wrist)
+  adiff        adiff        0.0024   0.0062  band-pass accel aS-aL  [experimental]
+                                   -> fast drivetrain-compliance mode above the smoothed-inertia band
+  vL           visc            nan   0.0036  EOM friction  b*qdot  [physical]
+                                   -> viscous drag (lubricant + brush/bearing) ~ speed
+  coul_sin_c3  fric_load    0.0026   0.0020  load-dependent Coulomb  [physical]
+                                   -> gearbox friction ~ normal/tooth load, which tracks gravity torque
+  lag_vL_a     history      0.0051   0.0005  transport delay of vL  [physical+exp]
+                                   -> fixed group delay through compliant high-ratio gear train
+  lag_aL_a     history      0.0029   0.0001  transport delay of aL  [physical+exp]
+                                   -> same drivetrain delay on the inertia channel
+
+  payload all-monotone: True
+wrote final_model6.json

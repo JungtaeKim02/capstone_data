@@ -1,0 +1,14 @@
+{
+  "features": [
+    "absLpred",
+    "absvL",
+    "Lpred2",
+    "vL2",
+    "absG_c4",
+    "absG_c3"
+  ],
+  "alpha": 100.0,
+  "sg_v": 61,
+  "meanCV": 0.8259413077464561,
+  "meanTest": 0.7636240757321345
+}

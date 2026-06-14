@@ -1,0 +1,99 @@
+{
+  "features": [
+    "vL",
+    "cos_c3",
+    "tanh_vP",
+    "aL",
+    "sin_q2",
+    "lag_vL_a",
+    "lag_aL_a",
+    "cos_c4",
+    "coul_sin_c3",
+    "adiff"
+  ],
+  "constants": {
+    "sg_v": 91,
+    "sg_a": 51,
+    "sg_as": 21,
+    "sg_vp": 161,
+    "lag_a": 30,
+    "fc_slow": 0.025,
+    "alpha": 10.0,
+    "meanCV": 0.9679085652321421,
+    "meanTest": 0.9509056869352689,
+    "worstTest": 0.9193585527869031
+  },
+  "meanCV": 0.9679081367078327,
+  "worstNRMSE": 0.23404019161386214,
+  "meanTest": 0.9509081502002995,
+  "worstTest": 0.9193622121207484,
+  "per_traj": {
+    "test_noload": 0.9563253791709686,
+    "test_noload_2": 0.9603895902109384,
+    "test_noload_3": 0.9614403195899802,
+    "test_noload_4": 0.9522428095510991,
+    "test_noload_5": 0.9556885905580632,
+    "test_noload_p2p": 0.9193622121207484
+  },
+  "payload_monotone": true,
+  "tests": [
+    "test_noload",
+    "test_noload_2",
+    "test_noload_3",
+    "test_noload_4",
+    "test_noload_5",
+    "test_noload_p2p"
+  ],
+  "justification": {
+    "vL": {
+      "eom": "EOM friction  b*qdot",
+      "mechanism": "viscous drag (lubricant + brush/bearing) ~ speed",
+      "kind": "physical"
+    },
+    "cos_c3": {
+      "eom": "EOM gravity  g(q)",
+      "mechanism": "weight of links beyond elbow ~ cos(cumulative angle)",
+      "kind": "physical"
+    },
+    "tanh_vP": {
+      "eom": "Coulomb sign on low-pass vel",
+      "mechanism": "gear-train lag/windup -> friction sign follows SMOOTHED velocity",
+      "kind": "physical+exp"
+    },
+    "aL": {
+      "eom": "EOM inertia  M_ii*qddot",
+      "mechanism": "reflected inertia N^2*Jmotor dominates at high gear ratio",
+      "kind": "physical"
+    },
+    "sin_q2": {
+      "eom": "EOM gravity  g(q)",
+      "mechanism": "orthogonal gravity phase on the shoulder link",
+      "kind": "physical"
+    },
+    "lag_vL_a": {
+      "eom": "transport delay of vL",
+      "mechanism": "fixed group delay through compliant high-ratio gear train",
+      "kind": "physical+exp"
+    },
+    "lag_aL_a": {
+      "eom": "transport delay of aL",
+      "mechanism": "same drivetrain delay on the inertia channel",
+      "kind": "physical+exp"
+    },
+    "cos_c4": {
+      "eom": "EOM gravity  g(q)",
+      "mechanism": "weight of wrist link ~ cos(cumulative angle to wrist)",
+      "kind": "physical"
+    },
+    "coul_sin_c3": {
+      "eom": "load-dependent Coulomb",
+      "mechanism": "gearbox friction ~ normal/tooth load, which tracks gravity torque",
+      "kind": "physical"
+    },
+    "adiff": {
+      "eom": "band-pass accel aS-aL",
+      "mechanism": "fast drivetrain-compliance mode above the smoothed-inertia band",
+      "kind": "experimental"
+    }
+  }
+}

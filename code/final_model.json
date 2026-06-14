@@ -1,0 +1,42 @@
+{
+  "features": [
+    "vL",
+    "cos_c3",
+    "tanh_vP",
+    "aL",
+    "sin_q2",
+    "lag_vL_a",
+    "lag_aL_a",
+    "cos_c4",
+    "coul_sin_c3",
+    "adiff"
+  ],
+  "reselected_under_opt": [
+    "vL",
+    "cos_c3",
+    "tanh_vP",
+    "sin_q2",
+    "aL",
+    "adiff",
+    "lag_aL_a",
+    "cos_c4",
+    "coul_sin_c3",
+    "strib",
+    "lag_dir",
+    "aL_cos_c3"
+  ],
+  "constants": {
+    "sg_v": 61,
+    "sg_a": 61,
+    "sg_vp": 161,
+    "lag_a": 25,
+    "lag_b": 150,
+    "fc_slow": 0.02,
+    "fc_fast": 0.2,
+    "fc_strib": 0.1,
+    "alpha": 10.0
+  },
+  "meanCV_R2": 0.9646770962012353,
+  "worstNRMSE": 0.24440512437938275,
+  "meanB_R2": 0.9530063413658262
+}

@@ -1,0 +1,48 @@
+==================================================================================
+TASK 3  LOAD vs CURRENT  characteristics + fusion (all from CSV)
+==================================================================================
+
+=== A. per-region residual NRMSE (pooled 6 held-out tests) ===
+  NRMSE = std(residual)/std(channel); LOWER = channel better predicted there
+
+  -- binned by |aL| terciles --
+  joint                |aL| low             mid            high
+                     load / cur      load / cur      load / cur
+  J2              0.270 / 0.468   0.204 / 0.432   0.276 / 0.539
+  J3              0.233 / 0.402   0.163 / 0.330   0.212 / 0.449
+  J4              0.161 / 0.480   0.144 / 0.499   0.181 / 0.587
+
+  -- binned by |vL| terciles --
+  joint                |vL| low             mid            high
+                     load / cur      load / cur      load / cur
+  J2              0.307 / 0.457   0.213 / 0.404   0.225 / 0.567
+  J3              0.275 / 0.463   0.163 / 0.333   0.153 / 0.381
+  J4              0.210 / 0.472   0.143 / 0.488   0.121 / 0.600
+
+=== B. corr(resid_load, resid_cur) on held-out tests (high=redundant) ===
+  joint       corr
+  J2         0.421
+  J3         0.483
+  J4         0.205
+
+=== C+E. payload detection: SNR per channel + fused (run_1 ref, run_2 noise) ===
+  joint   mass  SNR_load   SNR_cur  SNR_fused best_single  fusion?
+  J2       84g      2.92      3.41       3.89        3.41      YES
+  J2      146g      5.53      6.90       7.84        6.90      YES
+  J2      227g     11.27     15.57      17.04       15.57      YES
+  J3       84g      3.44      3.96       4.50        3.96      YES
+  J3      146g      5.01      6.72       7.24        6.72      YES
+  J3      227g      8.35     12.67      13.10       12.67      YES
+  J4       84g      2.82      2.45       3.31        2.82      YES
+  J4      146g      3.72      3.63       4.68        3.72      YES
+  J4      227g      5.09      6.01       7.14        6.01      YES
+
+=== D. claim 'high accel -> load weak, current strong' (per-region NRMSE, accel) ===
+  re-using A: compare load NRMSE low->high |aL| vs current NRMSE low->high.
+  (if load NRMSE rises with |aL| while cur NRMSE falls -> gating justified)
+  J2: load NRMSE low->high |aL| 0.270->0.276 (rises); cur 0.468->0.539 (rises)
+  J3: load NRMSE low->high |aL| 0.233->0.212 (falls); cur 0.402->0.449 (rises)
+  J4: load NRMSE low->high |aL| 0.161->0.181 (rises); cur 0.480->0.587 (rises)
+
+=== VERDICT ===
+  mean fused-minus-best SNR per joint: J2=+0.96, J3=+0.50, J4=+0.86

@@ -1,0 +1,21 @@
+======================================================================
+STAGE 3  current-model constants (slim: absLpred, absvL, Lpred2, vL2, absG_c4, absG_c3)
+======================================================================
+
+--- alpha grid (sg_v=41) ---
+     alpha   meanCV  meanTest
+         3   0.8254    0.7638
+        10   0.8254    0.7638
+        30   0.8254    0.7638
+       100   0.8254    0.7638
+  -> alpha=100.0
+
+--- sg_v grid (alpha=100.0) ---
+      sg_v   meanCV  meanTest
+        41   0.8254    0.7638
+        61   0.8259    0.7636
+        81   0.8257    0.7628
+        91   0.8252    0.7623
+  -> sg_v=61  meanCV=0.8259 meanTest=0.7636
+
+wrote cur_constants.json

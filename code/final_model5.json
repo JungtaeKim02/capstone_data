@@ -1,0 +1,49 @@
+{
+  "features": [
+    "vL",
+    "cos_c3",
+    "tanh_vP",
+    "aL",
+    "sin_q2",
+    "lag_vL_a",
+    "lag_aL_a",
+    "cos_c4",
+    "coul_sin_c3",
+    "adiff"
+  ],
+  "reselected_under_opt": [
+    "vL",
+    "cos_c3",
+    "tanh_vP",
+    "sin_q2",
+    "aL",
+    "adiff",
+    "lag_aL_a",
+    "cos_c4",
+    "coul_sin_c3",
+    "strib"
+  ],
+  "stable_to_constants": false,
+  "constants": {
+    "sg_v": 61,
+    "sg_a": 61,
+    "sg_vp": 161,
+    "lag_a": 25,
+    "lag_b": 150,
+    "fc_slow": 0.02,
+    "fc_fast": 0.2,
+    "fc_strib": 0.1,
+    "alpha": 10.0
+  },
+  "meanCV_R2": 0.9646770962012353,
+  "worstNRMSE": 0.24440512437938275,
+  "meanTest_R2": 0.9476774223439779,
+  "worstTest_R2": 0.9176764326514348,
+  "per_traj": {
+    "test_noload_2": 0.9577268259973281,
+    "test_noload_3": 0.9591739241839968,
+    "test_noload_4": 0.949957822439016,
+    "test_noload_5": 0.9538521064481142,
+    "test_noload_p2p": 0.9176764326514348
+  }
+}
